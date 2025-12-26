@@ -42,6 +42,19 @@ nav a {
   display: block;
 
   padding-block: .125em;
+  text-decoration: none;
+  color: inherit;
+}
+
+nav a:hover {
+  background-color: hsla(0, 0%, 100%, .5);
+  text-decoration: underline;
+}
+
+nav a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+  background-color: hsla(0, 0%, 100%, .5);
 }
 
 main {
