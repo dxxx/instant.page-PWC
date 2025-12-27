@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/instantpage/instant.page/issues"
   },
-  "homepage": "https://instant.page/"
+  "homepage": "https://instant.page/",
+  "dependencies": {
+    "playwright": "^1.57.0"
+  }
 }
