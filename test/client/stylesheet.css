@@ -108,3 +108,25 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+form .apply-btn {
+  display: block;
+  margin: 5px;
+  padding: 5px 10px;
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+form .apply-btn:hover {
+  background-color: #f0f0f0;
+  border-color: #666;
+}
+
+@media (min-width: 1000px) {
+  form .apply-btn {
+    display: inline-block;
+  }
+}

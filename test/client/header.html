@@ -6,7 +6,7 @@
 
 <body>
 
-<form>
+<form aria-label="Test Configuration">
   <label>
     Allow query string &amp; external links:
     <input name="aqsael" type="checkbox" :checked_aqsael>
@@ -16,7 +16,7 @@
     <input name="whitelist" type="checkbox" :checked_whitelist>
   </label>
   <label>
-    Page load time:
+    Page load time (ms):
     <input name="sleep" type="number" :value_sleep>
   </label>
   <label>
@@ -45,9 +45,7 @@
       <option :vary_accept_simulate_shopify>Simulate Shopify</option>
     </select>
   </label>
-  <label>
-    <input type="submit" value="OK">
-  </label>
+  <button type="submit" class="apply-btn">Apply Settings</button>
   <inspag-body></inspag-body>
 </form>
 
