@@ -101,6 +101,22 @@ form input[type="text"] {
   width: 110px;
 }
 
+form button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+@media (min-width: 1000px) {
+  form button {
+    margin-right: 10px;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid black;
+  outline-offset: 2px;
+}
+
 form inspag-body {
   display: block;
   font-size: 1.25em;
