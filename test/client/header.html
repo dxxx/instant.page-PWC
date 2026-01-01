@@ -17,7 +17,7 @@
   </label>
   <label>
     Page load time:
-    <input name="sleep" type="number" :value_sleep>
+    <input name="sleep" type="number" min="0" :value_sleep>
   </label>
   <label>
     Intensity:
@@ -32,7 +32,7 @@
   </datalist>
   <label>
     Cache max age (in seconds):
-    <input name="cacheAge" type="number" :value_cacheAge>
+    <input name="cacheAge" type="number" min="0" :value_cacheAge>
   </label>
   <label>
     Use minified:
@@ -45,9 +45,7 @@
       <option :vary_accept_simulate_shopify>Simulate Shopify</option>
     </select>
   </label>
-  <label>
-    <input type="submit" value="OK">
-  </label>
+  <button type="submit">Update settings</button>
   <inspag-body></inspag-body>
 </form>
 
