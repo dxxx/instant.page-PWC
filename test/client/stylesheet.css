@@ -108,3 +108,34 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+/* Button Styles */
+.settings-save-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.settings-save-btn:hover {
+  background-color: #0056b3;
+}
+
+.settings-save-btn:focus-visible {
+  outline: 2px solid #0056b3;
+  outline-offset: 2px;
+}
+
+form label {
+  cursor: pointer;
+}
+
+main a:focus-visible {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
+}
