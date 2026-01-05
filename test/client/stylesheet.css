@@ -67,6 +67,18 @@ main a:active {
   background: hsla(0, 0%, 0%, .25);
 }
 
+/* Accessible focus styles */
+:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
+}
+
+main a:focus-visible {
+  border-color: #005fcc;
+  outline: none;
+  background: hsla(0, 0%, 100%, 0.5);
+}
+
 main a small {
   font-size: .75em;
   opacity: .75;
@@ -99,6 +111,12 @@ form input[type="number"] {
 
 form input[type="text"] {
   width: 110px;
+}
+
+form input:focus-visible,
+form select:focus-visible {
+  outline: 2px solid #005fcc;
+  border-color: #005fcc;
 }
 
 form inspag-body {
