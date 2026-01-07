@@ -11,6 +11,11 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
 @media (min-width: 1000px) {
   body {
     grid-template-areas:
@@ -80,6 +85,7 @@ form {
 form label {
   display: block;
   padding: 5px;
+  cursor: pointer;
 }
 
 form label:has(input:checked) {
@@ -99,6 +105,24 @@ form input[type="number"] {
 
 form input[type="text"] {
   width: 110px;
+}
+
+form input[type="submit"] {
+  background: #008;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+form input[type="submit"]:hover {
+  background: #006;
+}
+
+form input[type="submit"]:focus-visible {
+  outline-color: #008;
 }
 
 form inspag-body {
