@@ -8,6 +8,8 @@ let _chromiumMajorVersionInUserAgent = null
   , _delayOnHover = 65
   , _lastTouchstartEvent
   , _mouseoverTimer
+  , _locationOrigin = location.origin
+  , _locationProtocol = location.protocol
   , _preloadedList = new Set()
 
 init()
@@ -44,7 +46,7 @@ function init() {
   // Browser engines older than that don’t support <script type=module>
   // and thus don’t load instant.page at all.
 
-  const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
+  const handleVaryAcceptHeader = document.body.hasAttribute('data-instant-vary-accept') || 'Shopify' in window
   // The `Vary: Accept` header when received in Chromium 79–109 makes prefetches
   // unusable, as Chromium used to send a different `Accept` header.
   // It’s applied on all Shopify sites by default, as Shopify is very popular
@@ -69,7 +71,7 @@ function init() {
 
   _speculationRulesType = 'none'
   if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
-    const speculationRulesConfig = document.body.dataset.instantSpecrules
+    const speculationRulesConfig = document.body.getAttribute('data-instant-specrules')
     if (speculationRulesConfig == 'prerender') {
       _speculationRulesType = 'prerender'
     } else if (speculationRulesConfig != 'no') {
@@ -77,16 +79,16 @@ function init() {
     }
   }
 
-  const useMousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
-  _allowQueryString = 'instantAllowQueryString' in document.body.dataset
-  _allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
-  _useWhitelist = 'instantWhitelist' in document.body.dataset
+  const useMousedownShortcut = document.body.hasAttribute('data-instant-mousedown-shortcut')
+  _allowQueryString = document.body.hasAttribute('data-instant-allow-query-string')
+  _allowExternalLinks = document.body.hasAttribute('data-instant-allow-external-links')
+  _useWhitelist = document.body.hasAttribute('data-instant-whitelist')
 
   let preloadOnMousedown = false
   let preloadOnlyOnMousedown = false
   let preloadWhenVisible = false
-  if ('instantIntensity' in document.body.dataset) {
-    const intensityParameter = document.body.dataset.instantIntensity
+  if (document.body.hasAttribute('data-instant-intensity')) {
+    const intensityParameter = document.body.getAttribute('data-instant-intensity')
 
     if (intensityParameter == 'mousedown' && !useMousedownShortcut) {
       preloadOnMousedown = true
@@ -353,12 +355,12 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (_useWhitelist && !('instant' in anchorElement.dataset)) {
+  if (_useWhitelist && !anchorElement.hasAttribute('data-instant')) {
     return
   }
 
-  if (anchorElement.origin != location.origin) {
-    let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
+  if (anchorElement.origin != _locationOrigin) {
+    let allowed = _allowExternalLinks || anchorElement.hasAttribute('data-instant')
     if (!allowed || !_chromiumMajorVersionInUserAgent) {
       // Chromium-only: see comment on “restrictive prefetch” and “cross-site speculation rules prefetch”
       return
@@ -369,11 +371,11 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (anchorElement.protocol == 'http:' && location.protocol == 'https:') {
+  if (anchorElement.protocol == 'http:' && _locationProtocol == 'https:') {
     return
   }
 
-  if (!_allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
+  if (!_allowQueryString && anchorElement.search && !anchorElement.hasAttribute('data-instant')) {
     return
   }
 
@@ -381,7 +383,7 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if ('noInstant' in anchorElement.dataset) {
+  if (anchorElement.hasAttribute('data-no-instant')) {
     return
   }
 
