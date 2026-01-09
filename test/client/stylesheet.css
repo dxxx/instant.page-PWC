@@ -63,6 +63,12 @@ main a:hover {
   border-color: hsla(0, 0%, 100%, 1);
 }
 
+main a:focus-visible {
+  outline: 3px solid #000;
+  outline-offset: -3px;
+  border-color: hsla(0, 0%, 100%, 1);
+}
+
 main a:active {
   background: hsla(0, 0%, 0%, .25);
 }
@@ -80,6 +86,7 @@ form {
 form label {
   display: block;
   padding: 5px;
+  cursor: pointer;
 }
 
 form label:has(input:checked) {
@@ -99,6 +106,12 @@ form input[type="number"] {
 
 form input[type="text"] {
   width: 110px;
+}
+
+form input:focus-visible,
+form select:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 1px;
 }
 
 form inspag-body {
