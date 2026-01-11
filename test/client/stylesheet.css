@@ -108,3 +108,17 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+/* Accessibility & Usability Improvements */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+label, button, input[type="submit"], input[type="button"], select {
+  cursor: pointer;
+}
+
+input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
+  cursor: text;
+}
