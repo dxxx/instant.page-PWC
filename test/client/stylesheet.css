@@ -19,6 +19,11 @@ body {
   }
 }
 
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 form {
   grid-area: header;
 }
@@ -80,6 +85,7 @@ form {
 form label {
   display: block;
   padding: 5px;
+  cursor: pointer;
 }
 
 form label:has(input:checked) {
@@ -99,6 +105,18 @@ form input[type="number"] {
 
 form input[type="text"] {
   width: 110px;
+}
+
+form input[type="submit"],
+form button,
+form select {
+  cursor: pointer;
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="email"] {
+  cursor: text;
 }
 
 form inspag-body {
