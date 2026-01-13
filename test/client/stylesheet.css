@@ -108,3 +108,26 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+/* Accessible Focus States */
+:is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Cursor Affordances */
+label,
+button,
+input[type="submit"],
+input[type="checkbox"],
+input[type="radio"],
+select {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"] {
+  cursor: text;
+}
