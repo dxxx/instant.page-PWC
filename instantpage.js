@@ -10,6 +10,12 @@ let _chromiumMajorVersionInUserAgent = null
   , _mouseoverTimer
   , _preloadedList = new Set()
 
+// Maximum number of URLs to remember as prefetched
+// Prevents unbounded memory growth on long-running sessions (SPAs)
+// When limit reached, oldest entry is removed (FIFO)
+// Value chosen to balance memory usage (~10KB for 100 URLs) vs. duplicate prevention
+const MAX_PREFETCH_HISTORY = 100
+
 init()
 
 function init() {
@@ -400,6 +406,13 @@ function isPreloadable(anchorElement) {
 function preload(url, fetchPriority = 'auto') {
   if (_preloadedList.has(url)) {
     return
+  }
+
+  // Implement FIFO cache eviction to prevent unbounded memory growth
+  // Sets maintain insertion order, so we can remove the first (oldest) entry
+  if (_preloadedList.size >= MAX_PREFETCH_HISTORY) {
+    const oldestUrl = _preloadedList.values().next().value
+    _preloadedList.delete(oldestUrl)
   }
 
   if (_speculationRulesType != 'none') {
