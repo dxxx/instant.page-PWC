@@ -1,20 +1,62 @@
 /*! instant.page v5.2.0 - (C) 2019-2025 Alexandre Dieulot - https://instant.page/license */
 
+// ============================================================================
+// CONFIGURATION CONSTANTS
+// ============================================================================
+
+// Default hover delay in milliseconds before triggering prefetch
+// Balances between user experience and false positives
+// 65ms allows detection of intentional hover vs. cursor passing through
+// Average hover-to-click time is 200-300ms, giving plenty of time to prefetch
+// Research: Nielsen Norman Group, "Response Times: The 3 Important Limits"
+const DEFAULT_HOVER_DELAY_MS = 65
+
+// Maximum number of URLs to remember as prefetched
+// Prevents unbounded memory growth on long-running sessions (SPAs)
+// When limit reached, oldest entry is removed (FIFO)
+// Value chosen to balance memory usage (~23KB for 100 URLs) vs. duplicate prevention
+const MAX_PREFETCH_HISTORY = 100
+
+// Minimum Chromium version for Vary: Accept header support
+// Chromium 79-109 sent different Accept headers for prefetch vs. navigation
+// This caused prefetched responses to be unusable due to Vary: Accept
+// Fixed in Chromium 110+
+// Affects Shopify sites and others using Vary: Accept
+const MIN_CHROMIUM_VERSION_FOR_VARY_ACCEPT = 110
+
+// Small screen threshold in square pixels
+// Used to determine if viewport prefetch should be enabled
+// iPhone 14 Pro Max: 430×932 = 400,760 px² (want)
+// Samsung Galaxy S22 Ultra (80% zoom): 450×965 = 434,250 px² (want)
+// Small tablet: 600×960 = 576,000 px² (don't want)
+// Threshold set between phone and tablet to target mobile devices only
+const SMALL_SCREEN_THRESHOLD_PX2 = 450000
+
+// Timeout for requestIdleCallback when setting up viewport prefetch
+// Ensures IntersectionObserver is set up even if browser never goes idle
+// 1500ms chosen as reasonable delay that won't impact user experience
+const IDLE_CALLBACK_TIMEOUT_MS = 1500
+
+// Maximum time window for touch-triggered mouse events
+// Mobile browsers send compatibility mouse events 0-1450ms after touch
+// Tested up to 1450ms on overwhelmed Samsung Galaxy S2
+// 2500ms provides margin while staying under "grab mouse" time (~2s)
+// Used to prevent double-prefetch on touch devices
+const TOUCH_EVENT_WINDOW_MS = 2500
+
+// ============================================================================
+// MODULE STATE
+// ============================================================================
+
 let _chromiumMajorVersionInUserAgent = null
   , _speculationRulesType
   , _allowQueryString
   , _allowExternalLinks
   , _useWhitelist
-  , _delayOnHover = 65
+  , _delayOnHover = DEFAULT_HOVER_DELAY_MS
   , _lastTouchstartEvent
   , _mouseoverTimer
   , _preloadedList = new Set()
-
-// Maximum number of URLs to remember as prefetched
-// Prevents unbounded memory growth on long-running sessions (SPAs)
-// When limit reached, oldest entry is removed (FIFO)
-// Value chosen to balance memory usage (~10KB for 100 URLs) vs. duplicate prevention
-const MAX_PREFETCH_HISTORY = 100
 
 init()
 
@@ -69,7 +111,7 @@ function init() {
   // In practice, Chromium browsers never shy from announcing "Chrome" in
   // their regular user agent string, as that maximizes their compatibility.
 
-  if (handleVaryAcceptHeader && _chromiumMajorVersionInUserAgent && _chromiumMajorVersionInUserAgent < 110) {
+  if (handleVaryAcceptHeader && _chromiumMajorVersionInUserAgent && _chromiumMajorVersionInUserAgent < MIN_CHROMIUM_VERSION_FOR_VARY_ACCEPT) {
     return
   }
 
@@ -104,7 +146,7 @@ function init() {
     }
 
     if (intensityParameter == 'viewport') {
-      const isOnSmallScreen = document.documentElement.clientWidth * document.documentElement.clientHeight < 450000
+      const isOnSmallScreen = document.documentElement.clientWidth * document.documentElement.clientHeight < SMALL_SCREEN_THRESHOLD_PX2
       // Smartphones are the most likely to have a slow connection, and
       // their small screen size limits the number of links (and thus
       // server load).
@@ -193,7 +235,7 @@ function init() {
         }
       })
     }, {
-      timeout: 1500,
+      timeout: IDLE_CALLBACK_TIMEOUT_MS,
     })
   }
 }
@@ -334,7 +376,7 @@ function isEventLikelyTriggeredByTouch(event) {
   // TODO: fill/find Chromium bug
   const durationBetweenLastTouchstartAndNow = now - _lastTouchstartEvent.timeStamp
 
-  const MAX_DURATION_TO_BE_CONSIDERED_TRIGGERED_BY_TOUCHSTART = 2500
+  const MAX_DURATION_TO_BE_CONSIDERED_TRIGGERED_BY_TOUCHSTART = TOUCH_EVENT_WINDOW_MS
   // How long after a touchstart event can a simulated mouseover/mousedown event fire?
   // /test/extras/delay-not-considered-touch.html tries to answer that question.
   // I saw up to 1450 ms on an overwhelmed Samsung Galaxy S2.
