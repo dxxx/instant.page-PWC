@@ -8,6 +8,8 @@
 
 :lock: Security information is in [SECURITY.md](SECURITY.md).
 
+:zap: Performance characteristics are in [PERFORMANCE.md](PERFORMANCE.md).
+
 ## Tests
 
 With [Node](https://nodejs.org/), run:
