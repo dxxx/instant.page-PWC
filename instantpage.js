@@ -60,6 +60,27 @@ let _chromiumMajorVersionInUserAgent = null
 
 init()
 
+/**
+ * Initializes instant.page prefetch functionality
+ *
+ * Performs browser compatibility checks, detects Chromium version, configures
+ * speculation rules support, and sets up event listeners based on intensity mode.
+ *
+ * Browser requirements:
+ * - Chromium ≥100, Firefox ≥115, or Safari ≥15.4
+ * - Prefetch API support (link rel="prefetch")
+ *
+ * Configuration via data attributes on <body>:
+ * - data-instant-intensity: hover delay (ms), "mousedown", "mousedown-only", "viewport", "viewport-all"
+ * - data-instant-allow-query-string: enable prefetch for URLs with query params
+ * - data-instant-allow-external-links: enable cross-origin prefetch (Chromium only)
+ * - data-instant-whitelist: only prefetch links with data-instant attribute
+ * - data-instant-mousedown-shortcut: enable immediate navigation on mousedown
+ * - data-instant-vary-accept: handle Vary: Accept header (Shopify compatibility)
+ * - data-instant-specrules: "prerender", "prefetch", or "no" for speculation rules
+ *
+ * @returns {void} Returns early if browser is unsupported or incompatible
+ */
 function init() {
   const supportChecksRelList = document.createElement('link').relList
 
@@ -240,6 +261,18 @@ function init() {
   }
 }
 
+/**
+ * Handles touchstart events for prefetching on touch devices
+ *
+ * Stores touch event properties (avoiding event pooling) and triggers prefetch
+ * with high priority if the touched element is a preloadable link.
+ *
+ * Note: Stores only target and timeStamp to avoid event pooling issues where
+ * browsers reuse event objects.
+ *
+ * @param {TouchEvent} event - The touchstart event
+ * @returns {void}
+ */
 function touchstartListener(event) {
   // Store only necessary properties to avoid event pooling issues
   // Browsers may reuse event objects, invalidating stored references
@@ -257,6 +290,15 @@ function touchstartListener(event) {
   preload(anchorElement.href, 'high')
 }
 
+/**
+ * Handles touchstart events when in mousedown-only mode
+ *
+ * Stores touch event properties without triggering prefetch, used only to enable
+ * touch detection in isEventLikelyTriggeredByTouch() for mousedown-only intensity.
+ *
+ * @param {TouchEvent} event - The touchstart event
+ * @returns {void}
+ */
 function touchstartEmptyListener(event) {
   // Store only necessary properties to avoid event pooling issues
   _lastTouchstartEvent = {
@@ -265,6 +307,19 @@ function touchstartEmptyListener(event) {
   }
 }
 
+/**
+ * Handles mouseover events for hover-based prefetching
+ *
+ * Triggers prefetch after a configurable delay (default 65ms) to distinguish
+ * intentional hovers from cursor passing through. Skips processing if the
+ * event was triggered by a touch (compatibility mouse event).
+ *
+ * Sets up a mouseout listener (with once:true) to cancel prefetch if user
+ * moves away before the delay expires.
+ *
+ * @param {MouseEvent} event - The mouseover event
+ * @returns {void} Returns early if event is touch-triggered or target lacks closest()
+ */
 function mouseoverListener(event) {
   if (isEventLikelyTriggeredByTouch(event)) {
     // This avoids uselessly adding a mouseout event listener and setting a timer.
@@ -293,6 +348,15 @@ function mouseoverListener(event) {
   }, _delayOnHover)
 }
 
+/**
+ * Handles mousedown events for mousedown-intensity prefetching
+ *
+ * Triggers prefetch when mouse button is pressed (before click), providing
+ * 100-200ms head start. Skips processing if event is touch-triggered.
+ *
+ * @param {MouseEvent} event - The mousedown event
+ * @returns {void} Returns early if event is touch-triggered or not preloadable
+ */
 function mousedownListener(event) {
   if (isEventLikelyTriggeredByTouch(event)) {
     // When preloading only on mousedown, not touch, we need to stop there
@@ -312,6 +376,18 @@ function mousedownListener(event) {
   preload(anchorElement.href, 'high')
 }
 
+/**
+ * Handles mouseout events to cancel pending prefetch timers
+ *
+ * Clears the hover delay timer if user moves cursor away from a link before
+ * the delay expires. Checks if mouseout is within the same link (moving between
+ * child elements) and ignores those cases.
+ *
+ * Automatically removed after first invocation (once:true listener).
+ *
+ * @param {MouseEvent} event - The mouseout event
+ * @returns {void} Returns early if moving within same link element
+ */
 function mouseoutListener(event) {
   if (event.relatedTarget && event.target.closest('a') === event.relatedTarget.closest('a')) {
     return
@@ -323,6 +399,19 @@ function mouseoutListener(event) {
   }
 }
 
+/**
+ * Handles mousedown events for instant navigation shortcut
+ *
+ * Immediately dispatches a synthetic click event on mousedown, eliminating the
+ * ~100ms delay between mousedown and click. Uses a magic detail value (1337)
+ * to distinguish synthetic clicks from real ones.
+ *
+ * Prevents the real click event to avoid double navigation. Only runs on actual
+ * mouse clicks (not touch-triggered, not modifier keys, left button only).
+ *
+ * @param {MouseEvent} event - The mousedown event
+ * @returns {void} Returns early if touch-triggered, wrong button, or modifiers pressed
+ */
 function mousedownShortcutListener(event) {
   if (isEventLikelyTriggeredByTouch(event)) {
     // Due to a high potential for complications with this mousedown shortcut
@@ -354,6 +443,24 @@ function mousedownShortcutListener(event) {
   anchorElement.dispatchEvent(customEvent)
 }
 
+/**
+ * Determines if a mouse event was triggered by a touch (compatibility event)
+ *
+ * Touch devices fire "mouseover", "mousedown", and other mouse events after
+ * touch events for compatibility with mouse-only code. This function detects
+ * such events to avoid double-prefetching on touch devices.
+ *
+ * Detection logic:
+ * - Compares event target with last touchstart target
+ * - Checks if event timestamp is within TOUCH_EVENT_WINDOW_MS (2500ms)
+ * - Tested on Samsung Galaxy S2 (up to 1450ms delay observed)
+ *
+ * False positives are acceptable (skip prefetch unnecessarily) but false negatives
+ * could cause issues in mousedownShortcutListener (double navigation).
+ *
+ * @param {MouseEvent} event - The mouse event to check
+ * @returns {boolean} True if event is likely triggered by a touch
+ */
 function isEventLikelyTriggeredByTouch(event) {
   // Touch devices fire “mouseover” and “mousedown” (and other) events after
   // a touch for compatibility reasons.
@@ -405,6 +512,22 @@ function isEventLikelyTriggeredByTouch(event) {
   // TODO: Consider using event screen position as another heuristic.
 }
 
+/**
+ * Checks if an anchor element is eligible for prefetching
+ *
+ * Validates against multiple criteria:
+ * - Element and href exist
+ * - Whitelist mode: requires data-instant attribute
+ * - Origin: same-origin only (unless explicitly allowed for external)
+ * - Protocol: only HTTP/HTTPS (no javascript:, file:, data:, etc.)
+ * - Security: no HTTPS→HTTP downgrade
+ * - Query strings: blocked by default (unless explicitly allowed)
+ * - Same-page anchors: excluded (hash-only navigation)
+ * - Blacklist: respects data-no-instant attribute
+ *
+ * @param {HTMLAnchorElement|null} anchorElement - The anchor element to check
+ * @returns {boolean|undefined} True if preloadable, undefined/false otherwise
+ */
 function isPreloadable(anchorElement) {
   if (!anchorElement || !anchorElement.href) {
     return
@@ -445,6 +568,21 @@ function isPreloadable(anchorElement) {
   return true
 }
 
+/**
+ * Prefetches a URL for faster subsequent navigation
+ *
+ * Implements FIFO cache (MAX_PREFETCH_HISTORY limit) to prevent memory growth.
+ * Uses Speculation Rules API when available, falls back to link prefetch element.
+ *
+ * Cache eviction:
+ * - Tracks up to 100 unique URLs (configurable via MAX_PREFETCH_HISTORY)
+ * - When full, removes oldest entry before adding new one
+ * - Prevents duplicate prefetches via Set.has() check
+ *
+ * @param {string} url - The absolute URL to prefetch
+ * @param {string} [fetchPriority='auto'] - Fetch priority: 'high' (touch/mouse) or 'auto' (viewport)
+ * @returns {void} Returns early if URL already prefetched
+ */
 function preload(url, fetchPriority = 'auto') {
   if (_preloadedList.has(url)) {
     return
@@ -466,6 +604,25 @@ function preload(url, fetchPriority = 'auto') {
   _preloadedList.add(url)
 }
 
+/**
+ * Prefetches URL using Speculation Rules API (modern method)
+ *
+ * Creates a <script type="speculationrules"> element with JSON configuration.
+ * Supports both prefetch and prerender modes (configured via data-instant-specrules).
+ *
+ * Advantages over link prefetch:
+ * - Better cross-origin support (no cookies requirement in some cases)
+ * - Prerender capability (full page rendering)
+ * - More explicit browser intent
+ *
+ * Browser support: Chromium 103+, Safari 17.0+ (prefetch only)
+ *
+ * Note: Script elements accumulate in <head>. This is acceptable as the browser
+ * manages the actual prefetch queue and limits.
+ *
+ * @param {string} url - The absolute URL to prefetch
+ * @returns {void}
+ */
 function preloadUsingSpeculationRules(url) {
   const scriptElement = document.createElement('script')
   scriptElement.type = 'speculationrules'
@@ -484,6 +641,26 @@ function preloadUsingSpeculationRules(url) {
   document.head.appendChild(scriptElement)
 }
 
+/**
+ * Prefetches URL using <link rel="prefetch"> element (fallback method)
+ *
+ * Creates a link element in <head> with prefetch relationship. Uses as="document"
+ * for Chromium to enable "restrictive prefetch" (cross-origin with cookies).
+ *
+ * Fetch priority:
+ * - 'high': User-triggered (touch/mouse) - steals bandwidth from other resources
+ * - 'auto': Viewport-triggered - uses default low priority
+ *
+ * Note on as="document":
+ * Chromium-specific feature enabling cross-origin prefetch. Chrome team plans to
+ * deprecate in favor of Speculation Rules API. Works well for now.
+ *
+ * Browser support: All browsers with prefetch support (Chromium, Firefox)
+ *
+ * @param {string} url - The absolute URL to prefetch
+ * @param {string} [fetchPriority='auto'] - Fetch priority: 'high' or 'auto'
+ * @returns {void}
+ */
 function preloadUsingLinkElement(url, fetchPriority = 'auto') {
   const linkElement = document.createElement('link')
   linkElement.rel = 'prefetch'
