@@ -193,7 +193,12 @@ function init() {
 }
 
 function touchstartListener(event) {
-  _lastTouchstartEvent = event
+  // Store only necessary properties to avoid event pooling issues
+  // Browsers may reuse event objects, invalidating stored references
+  _lastTouchstartEvent = {
+    target: event.target,
+    timeStamp: event.timeStamp
+  }
 
   const anchorElement = event.target.closest('a')
 
@@ -205,7 +210,11 @@ function touchstartListener(event) {
 }
 
 function touchstartEmptyListener(event) {
-  _lastTouchstartEvent = event
+  // Store only necessary properties to avoid event pooling issues
+  _lastTouchstartEvent = {
+    target: event.target,
+    timeStamp: event.timeStamp
+  }
 }
 
 function mouseoverListener(event) {
