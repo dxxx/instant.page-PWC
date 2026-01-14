@@ -6,6 +6,8 @@
 
 :scroll: The source is in [instantpage.js](https://github.com/instantpage/instant.page/blob/master/instantpage.js).
 
+:lock: Security information is in [SECURITY.md](SECURITY.md).
+
 ## Tests
 
 With [Node](https://nodejs.org/), run:
