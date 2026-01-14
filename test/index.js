@@ -44,7 +44,7 @@ async function requestListener(req, res) {
     'Content-Type': 'text/html',
   }
 
-  let pathString = req.url.substr(1)
+  let pathString = req.url.substring(1)
   let page = parseInt(pathString)
   if (pathString == '') {
     page = 1
@@ -143,7 +143,7 @@ async function requestListener(req, res) {
 
     content += makeAnchorElement('Opens in a new tab', `<a href="/${page}?${getRandomId()}" target="_blank" ${dataInstantAttribute}>`)
     content += makeAnchorElement('Other page anchor', `<a href="/${page}?${getRandomId()}#anchor" ${dataInstantAttribute}>`)
-    content += makeAnchorElement('Same-page anchor', `<a href="${req.url}#anchor" id="anchor">`)
+    content += makeAnchorElement('Same-page anchor', `<a href="${escapeHTMLTags(req.url)}#anchor" id="anchor">`)
     content += makeAnchorElement('Manually blacklisted link', `<a href="/${page}?${getRandomId()}" data-no-instant>`)
     content += makeAnchorElement('Non-whitelisted link', `<a href="/${page}?${getRandomId()}">`)
     content += makeAnchorElement('Query string', `<a href="/${page}?${getRandomId()}">`)
@@ -215,10 +215,14 @@ function makeAnchorElement(text, openingTag) {
 }
 
 function escapeHTMLTags(html) {
-  const escaped = html
-    .replace('<', '&lt;')
-    .replace('>', '&gt;')
-  return escaped
+  // Escape all HTML special characters to prevent XSS
+  // Must escape & first to avoid double-escaping
+  return html
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
 }
 
 async function fillHeaderWithTests(header) {
