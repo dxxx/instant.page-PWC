@@ -243,7 +243,7 @@ function mouseoverListener(event) {
     return
   }
 
-  anchorElement.addEventListener('mouseout', mouseoutListener, {passive: true})
+  anchorElement.addEventListener('mouseout', mouseoutListener, {passive: true, once: true})
 
   _mouseoverTimer = setTimeout(() => {
     preload(anchorElement.href, 'high')
