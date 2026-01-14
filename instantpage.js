@@ -118,9 +118,9 @@ function init() {
   _speculationRulesType = 'none'
   if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
     const speculationRulesConfig = document.body.dataset.instantSpecrules
-    if (speculationRulesConfig == 'prerender') {
+    if (speculationRulesConfig === 'prerender') {
       _speculationRulesType = 'prerender'
-    } else if (speculationRulesConfig != 'no') {
+    } else if (speculationRulesConfig !== 'no') {
       _speculationRulesType = 'prefetch'
     }
   }
@@ -136,16 +136,16 @@ function init() {
   if ('instantIntensity' in document.body.dataset) {
     const intensityParameter = document.body.dataset.instantIntensity
 
-    if (intensityParameter == 'mousedown' && !useMousedownShortcut) {
+    if (intensityParameter === 'mousedown' && !useMousedownShortcut) {
       preloadOnMousedown = true
     }
 
-    if (intensityParameter == 'mousedown-only' && !useMousedownShortcut) {
+    if (intensityParameter === 'mousedown-only' && !useMousedownShortcut) {
       preloadOnMousedown = true
       preloadOnlyOnMousedown = true
     }
 
-    if (intensityParameter == 'viewport') {
+    if (intensityParameter === 'viewport') {
       const isOnSmallScreen = document.documentElement.clientWidth * document.documentElement.clientHeight < SMALL_SCREEN_THRESHOLD_PX2
       // Smartphones are the most likely to have a slow connection, and
       // their small screen size limits the number of links (and thus
@@ -171,7 +171,7 @@ function init() {
       }
     }
 
-    if (intensityParameter == 'viewport-all') {
+    if (intensityParameter === 'viewport-all') {
       preloadWhenVisible = true
     }
 
@@ -313,7 +313,7 @@ function mousedownListener(event) {
 }
 
 function mouseoutListener(event) {
-  if (event.relatedTarget && event.target.closest('a') == event.relatedTarget.closest('a')) {
+  if (event.relatedTarget && event.target.closest('a') === event.relatedTarget.closest('a')) {
     return
   }
 
@@ -343,7 +343,7 @@ function mousedownShortcutListener(event) {
   }
 
   anchorElement.addEventListener('click', function (event) {
-    if (event.detail == 1337) {
+    if (event.detail === 1337) {
       return
     }
 
@@ -363,7 +363,7 @@ function isEventLikelyTriggeredByTouch(event) {
     return false
   }
 
-  if (event.target != _lastTouchstartEvent.target) {
+  if (event.target !== _lastTouchstartEvent.target) {
     return false
   }
 
@@ -414,10 +414,10 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (anchorElement.origin != location.origin) {
+  if (anchorElement.origin !== location.origin) {
     let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
     if (!allowed || !_chromiumMajorVersionInUserAgent) {
-      // Chromium-only: see comment on “restrictive prefetch” and “cross-site speculation rules prefetch”
+      // Chromium-only: see comment on "restrictive prefetch" and "cross-site speculation rules prefetch"
       return
     }
   }
@@ -426,7 +426,7 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (anchorElement.protocol == 'http:' && location.protocol == 'https:') {
+  if (anchorElement.protocol === 'http:' && location.protocol === 'https:') {
     return
   }
 
@@ -434,7 +434,7 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (anchorElement.hash && anchorElement.pathname + anchorElement.search == location.pathname + location.search) {
+  if (anchorElement.hash && anchorElement.pathname + anchorElement.search === location.pathname + location.search) {
     return
   }
 
@@ -457,7 +457,7 @@ function preload(url, fetchPriority = 'auto') {
     _preloadedList.delete(oldestUrl)
   }
 
-  if (_speculationRulesType != 'none') {
+  if (_speculationRulesType !== 'none') {
     preloadUsingSpeculationRules(url)
   } else {
     preloadUsingLinkElement(url, fetchPriority)

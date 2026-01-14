@@ -28,7 +28,7 @@ function init() {
 }
 
 async function requestListener(req, res) {
-  const isPrefetched = req.headers['purpose'] == 'prefetch' /* Chromium link prefetch, WebKit */ ||
+  const isPrefetched = req.headers['purpose'] === 'prefetch' /* Chromium link prefetch, WebKit */ ||
                        req.headers['sec-purpose']?.startsWith('prefetch') /* Chromium speculation rules, Firefox 115+ prefetch */
   const prefetchIndicator = isPrefetched ? 'PF' : ' F'
   const type = req.headers['sec-fetch-dest'] ? req.headers['sec-fetch-dest'].toUpperCase()[0] : '.'
@@ -46,7 +46,7 @@ async function requestListener(req, res) {
 
   let pathString = req.url.substring(1)
   let page = parseInt(pathString)
-  if (pathString == '') {
+  if (pathString === '') {
     page = 1
   }
 
@@ -56,7 +56,7 @@ async function requestListener(req, res) {
   const jsContent = await fs.readFile(jsPath)
   const jsHash = sha384(jsContent)
 
-  if (pathString == 'instantpage.js') {
+  if (pathString === 'instantpage.js') {
     headers['Content-Type'] = 'text/javascript'
     content = jsContent
   }
@@ -65,7 +65,7 @@ async function requestListener(req, res) {
     const path = new URL(`client/${pathString}`, import.meta.url)
     content = await fs.readFile(path)
   }
-  else if (pathString == 'favicon.ico') {
+  else if (pathString === 'favicon.ico') {
     headers['Content-Type'] = 'image/svg+xml'
     const faviconPath = new URL('client/favicon.svg', import.meta.url)
     const favicon = await fs.readFile(faviconPath)
@@ -81,7 +81,7 @@ async function requestListener(req, res) {
       headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
     }
 
-    if (VARY_ACCEPT != 'Off') {
+    if (VARY_ACCEPT !== 'Off') {
       headers['Vary'] = 'Accept'
     }
 
@@ -102,15 +102,15 @@ async function requestListener(req, res) {
       content = content.replace('<body', '<body data-instant-whitelist')
     }
 
-    if (INTENSITY != 65) {
+    if (INTENSITY !== 65) {
       content = content.replace('<body', `<body data-instant-intensity="${INTENSITY}"`)
     }
     const dataInstantAttribute = !ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS || USE_WHITELIST ? `data-instant` : ``
 
-    if (VARY_ACCEPT == 'On') {
+    if (VARY_ACCEPT === 'On') {
       content = content.replace('<body', '<body data-instant-vary-accept')
     }
-    if (VARY_ACCEPT == 'Simulate Shopify') {
+    if (VARY_ACCEPT === 'Simulate Shopify') {
       content = content.replace(/<body[^>]*>/, '$&\n<script>Shopify = {}</script>')
     }
 
@@ -121,7 +121,7 @@ async function requestListener(req, res) {
     content = content.replace(':value_intensity', `value="${INTENSITY}"`)
     content = content.replace(':checked_minified', USE_MINIFIED ? 'checked' : '')
     content = content.replaceAll(/ :vary_accept_([a-z_]+)/g, (match, p1) => {
-      if (p1 == VARY_ACCEPT.toLowerCase().replace(' ', '_')) {
+      if (p1 === VARY_ACCEPT.toLowerCase().replace(' ', '_')) {
         return ' selected'
       }
       return ''
@@ -130,13 +130,13 @@ async function requestListener(req, res) {
     const matches = content.match(/<body([^>]*)>/)
     const openingBodyTagEscaped = matches[1].replace('<', '&lt;').replace('>', '&gt;')
     content = content.replace('<inspag-body>', `<inspag-body>${openingBodyTagEscaped}`)
-    if (VARY_ACCEPT == 'Simulate Shopify') {
+    if (VARY_ACCEPT === 'Simulate Shopify') {
       content = content.replace('</inspag-body>', ' (window.Shopify)</inspag-body>')
     }
 
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
-      if (page != i) {
+      if (page !== i) {
         content += makeAnchorElement(`Page ${i}`, `<a href="/${i}?${getRandomId()}" ${dataInstantAttribute}>`)
       }
     }
@@ -173,7 +173,7 @@ function handleCookies(req) {
   cookies.split('; ').map((cookie) => {
     const [key, value] = cookie.split('=')
 
-    if (key != 'instantpage_test') {
+    if (key !== 'instantpage_test') {
       return
     }
 
@@ -230,7 +230,7 @@ async function fillHeaderWithTests(header) {
   const path = new URL('tests', import.meta.url)
   const dir = await fs.readdir(path)
   for (const testDir of dir) {
-    if (testDir == '_template') {
+    if (testDir === '_template') {
       continue
     }
 
