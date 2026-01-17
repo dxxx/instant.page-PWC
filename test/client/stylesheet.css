@@ -57,6 +57,7 @@ main a {
   text-decoration: none;
   color: #008;
   font-size: 1.5em;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 main a:hover {
@@ -107,4 +108,26 @@ form inspag-body {
   opacity: .9;
   font-family: monospace;
   word-spacing: .4em;
+}
+
+/* Palette UX improvements */
+button,
+input[type="submit"],
+input[type="checkbox"],
+label,
+select,
+summary {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+textarea {
+  cursor: text;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
