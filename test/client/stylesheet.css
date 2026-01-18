@@ -80,6 +80,7 @@ form {
 form label {
   display: block;
   padding: 5px;
+  cursor: pointer;
 }
 
 form label:has(input:checked) {
@@ -95,10 +96,16 @@ form label:has(input:checked) {
 
 form input[type="number"] {
   width: 50px;
+  cursor: text;
 }
 
 form input[type="text"] {
   width: 110px;
+  cursor: text;
+}
+
+form input[type="submit"] {
+  cursor: pointer;
 }
 
 form inspag-body {
