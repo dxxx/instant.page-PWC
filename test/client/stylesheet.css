@@ -80,6 +80,7 @@ form {
 form label {
   display: block;
   padding: 5px;
+  cursor: pointer;
 }
 
 form label:has(input:checked) {
@@ -99,6 +100,23 @@ form input[type="number"] {
 
 form input[type="text"] {
   width: 110px;
+}
+
+form label input[type="text"],
+form label input[type="number"],
+form label input[type="email"] {
+  cursor: text;
+}
+
+form input[type="submit"] {
+  cursor: pointer;
+}
+
+main a:focus-visible,
+form input:focus-visible,
+form select:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 form inspag-body {
