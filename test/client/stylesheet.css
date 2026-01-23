@@ -108,3 +108,23 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+/* Palette: Micro-UX Improvements */
+
+/* Interaction: Cursor Styles */
+label,
+input[type="submit"],
+select {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="number"] {
+  cursor: text;
+}
+
+/* Accessibility: Focus Indicators */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
