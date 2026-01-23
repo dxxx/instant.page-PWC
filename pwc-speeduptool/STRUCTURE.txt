@@ -1,0 +1,86 @@
+PWC SpeedUpTool - Plugin Structure
+=====================================
+
+pwc-speeduptool/
+│
+├── pwc-speeduptool.php         # Main plugin file with WordPress headers
+│                               # Contains: Plugin class, settings, enqueue logic
+│                               # Size: 18KB
+│
+├── uninstall.php               # Cleanup on plugin uninstall
+│                               # Deletes all plugin options from database
+│
+├── index.php                   # Security file (prevents directory listing)
+│
+├── README.md                   # GitHub documentation
+│                               # Comprehensive guide with examples and usage
+│
+├── readme.txt                  # WordPress.org plugin repository readme
+│                               # Following WordPress readme standards
+│
+├── STRUCTURE.txt               # This file - plugin structure documentation
+│
+└── assets/                     # Plugin assets
+    ├── index.php               # Security file
+    │
+    └── js/                     # JavaScript files
+        ├── index.php           # Security file
+        │
+        └── instantpage.js      # instant.page v5.2.0 library
+                                # Enhanced with security and performance fixes
+                                # Size: 28KB (2.5KB Brotli compressed)
+
+Features
+========
+
+✅ WordPress Plugin Standards Compliant
+✅ Security: All directories protected with index.php
+✅ Uninstall: Clean database cleanup on removal
+✅ i18n Ready: Translation-ready with text domain
+✅ Settings API: WordPress Settings API integration
+✅ Admin UI: Comprehensive settings page
+✅ Documentation: Complete readme.txt for WP.org
+✅ GitHub: README.md with badges and examples
+
+Configuration Options
+====================
+
+1. Enable/Disable Plugin
+2. Intensity Mode (5 options)
+   - Default (65ms hover)
+   - Mousedown
+   - Mousedown Only
+   - Viewport (Mobile)
+   - Viewport All
+3. Allow Query Strings
+4. Allow External Links
+5. Whitelist Mode
+6. Mousedown Shortcut
+7. Speculation Rules (Auto/Prefetch/Prerender/No)
+
+Technical Details
+=================
+
+- WordPress Version: 5.0+
+- PHP Version: 7.2+
+- Browser Support: Chrome 100+, Firefox 115+, Safari 15.4+
+- File Size: ~50KB total, 2.5KB Brotli (frontend JS)
+- Memory Usage: ~23KB max (FIFO cache)
+- Database: 7 wp_options entries
+- External Requests: None (all local)
+- Dependencies: None
+
+Installation
+============
+
+1. Upload pwc-speeduptool/ to wp-content/plugins/
+2. Activate via WordPress admin
+3. Configure at Settings > PWC SpeedUpTool
+4. Test with browser DevTools Network tab
+
+Links
+=====
+
+Website: https://prowebcare.com/
+instant.page: https://instant.page/
+License: GPL v2 or later
