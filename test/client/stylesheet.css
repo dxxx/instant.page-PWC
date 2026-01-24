@@ -108,3 +108,20 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+label,
+button,
+input[type="submit"],
+select {
+  cursor: pointer;
+}
+
+label input[type="text"],
+label input[type="number"] {
+  cursor: text;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
