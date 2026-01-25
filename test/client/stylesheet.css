@@ -11,6 +11,11 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 @media (min-width: 1000px) {
   body {
     grid-template-areas:
@@ -80,6 +85,19 @@ form {
 form label {
   display: block;
   padding: 5px;
+  cursor: pointer;
+}
+
+form label input[type="text"],
+form label input[type="number"],
+form label input[type="email"] {
+  cursor: text;
+}
+
+form button,
+form input[type="submit"],
+form select {
+  cursor: pointer;
 }
 
 form label:has(input:checked) {
