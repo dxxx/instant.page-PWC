@@ -108,3 +108,24 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+label, input[type="submit"], button, select, summary {
+  cursor: pointer;
+}
+
+input[type="text"], input[type="number"] {
+  cursor: text;
+}
+
+:is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+input[type="submit"]:hover {
+  background-color: hsla(0, 0%, 100%, 0.5);
+}
+
+input[type="submit"]:active {
+  background-color: hsla(0, 0%, 0%, 0.1);
+}
