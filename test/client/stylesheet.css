@@ -108,3 +108,31 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+label,
+button,
+input[type="submit"],
+input[type="checkbox"],
+select {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+textarea {
+  cursor: text;
+}
+
+:is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+input[type="submit"]:hover {
+  background: hsla(0, 0%, 100%, 0.5);
+}
+
+input[type="submit"]:active {
+  background: hsla(0, 0%, 0%, 0.1);
+}
