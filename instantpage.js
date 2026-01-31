@@ -9,6 +9,8 @@ let _chromiumMajorVersionInUserAgent = null
   , _lastTouchstartEvent
   , _mouseoverTimer
   , _preloadedList = new Set()
+  , _locationOrigin
+  , _locationProtocol
 
 init()
 
@@ -43,6 +45,9 @@ function init() {
   // - WebKit as in Safari ⩾ 10.1 (iOS ⩾ 10.3 and macOS ⩾ 10.10)
   // Browser engines older than that don’t support <script type=module>
   // and thus don’t load instant.page at all.
+
+  _locationOrigin = location.origin
+  _locationProtocol = location.protocol
 
   const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
   // The `Vary: Accept` header when received in Chromium 79–109 makes prefetches
@@ -353,12 +358,12 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (_useWhitelist && !('instant' in anchorElement.dataset)) {
+  if (_useWhitelist && !anchorElement.hasAttribute('data-instant')) {
     return
   }
 
-  if (anchorElement.origin != location.origin) {
-    let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
+  if (anchorElement.origin != _locationOrigin) {
+    let allowed = _allowExternalLinks || anchorElement.hasAttribute('data-instant')
     if (!allowed || !_chromiumMajorVersionInUserAgent) {
       // Chromium-only: see comment on “restrictive prefetch” and “cross-site speculation rules prefetch”
       return
@@ -369,11 +374,11 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (anchorElement.protocol == 'http:' && location.protocol == 'https:') {
+  if (anchorElement.protocol == 'http:' && _locationProtocol == 'https:') {
     return
   }
 
-  if (!_allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
+  if (!_allowQueryString && anchorElement.search && !anchorElement.hasAttribute('data-instant')) {
     return
   }
 
@@ -381,7 +386,7 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if ('noInstant' in anchorElement.dataset) {
+  if (anchorElement.hasAttribute('data-no-instant')) {
     return
   }
 
