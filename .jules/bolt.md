@@ -1,0 +1,3 @@
+## 2024-05-22 - Testing instantpage.js in Node.js
+**Learning:** `instantpage.js` executes `init()` immediately upon loading. To unit test logic like `isPreloadable` in a `node:vm` environment, you must fully mock the browser environment (`window`, `document`, `location`, `navigator`, etc.) *before* executing the script. `document.createElement('link').relList.supports('prefetch')` is a hard dependency for initialization.
+**Action:** Use a robust mock setup (like `verify_correctness.js`) that defines `location` and `document` interfaces matching browser behavior to test internal functions without a real browser.
