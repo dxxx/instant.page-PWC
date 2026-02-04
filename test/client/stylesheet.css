@@ -11,6 +11,43 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+label,
+button,
+input[type="submit"],
+select,
+summary,
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+label input[type="text"],
+label input[type="number"] {
+  cursor: text;
+}
+
+:is(a, button, input, select, summary):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+button,
+input[type="submit"] {
+  padding: 0.5em 1em;
+  background: hsla(0, 0%, 100%, 0.25);
+  border: 1px solid hsla(0, 0%, 0%, 0.15);
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background: hsla(0, 0%, 100%, 0.5);
+}
+
+button:active,
+input[type="submit"]:active {
+  background: hsla(0, 0%, 0%, 0.1);
+}
+
 @media (min-width: 1000px) {
   body {
     grid-template-areas:
