@@ -10,6 +10,10 @@ let _chromiumMajorVersionInUserAgent = null
   , _mouseoverTimer
   , _preloadedList = new Set()
 
+// Caching location properties for performance (avoiding host object lookups)
+const _locationOrigin = location.origin
+const _locationProtocol = location.protocol
+
 init()
 
 function init() {
@@ -353,12 +357,13 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (_useWhitelist && !('instant' in anchorElement.dataset)) {
+  // using hasAttribute instead of dataset for performance (avoids creating DOMStringMap proxy)
+  if (_useWhitelist && !anchorElement.hasAttribute('data-instant')) {
     return
   }
 
-  if (anchorElement.origin != location.origin) {
-    let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
+  if (anchorElement.origin != _locationOrigin) {
+    let allowed = _allowExternalLinks || anchorElement.hasAttribute('data-instant')
     if (!allowed || !_chromiumMajorVersionInUserAgent) {
       // Chromium-only: see comment on “restrictive prefetch” and “cross-site speculation rules prefetch”
       return
@@ -369,11 +374,11 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (anchorElement.protocol == 'http:' && location.protocol == 'https:') {
+  if (anchorElement.protocol == 'http:' && _locationProtocol == 'https:') {
     return
   }
 
-  if (!_allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
+  if (!_allowQueryString && anchorElement.search && !anchorElement.hasAttribute('data-instant')) {
     return
   }
 
@@ -381,7 +386,7 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if ('noInstant' in anchorElement.dataset) {
+  if (anchorElement.hasAttribute('data-no-instant')) {
     return
   }
 
