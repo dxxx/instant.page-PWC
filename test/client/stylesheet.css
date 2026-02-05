@@ -108,3 +108,44 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+/* Accessibility & Interaction Improvements */
+label,
+button,
+input[type="submit"],
+input[type="checkbox"],
+select,
+summary {
+  cursor: pointer;
+}
+
+/* Reset cursor for text inputs inside labels */
+label input[type="text"],
+label input[type="number"],
+label input[type="email"],
+label textarea {
+  cursor: text;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Button polish */
+input[type="submit"] {
+  padding: 4px 12px;
+  background: hsla(0, 0%, 100%, 0.5);
+  border: 1px solid hsla(0, 0%, 0%, 0.2);
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+input[type="submit"]:hover {
+  background: hsla(0, 0%, 100%, 0.8);
+}
+
+input[type="submit"]:active {
+  background: hsla(0, 0%, 100%, 0.4);
+  transform: translateY(1px);
+}
