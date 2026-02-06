@@ -108,3 +108,43 @@ form inspag-body {
   font-family: monospace;
   word-spacing: .4em;
 }
+
+label,
+button,
+input[type="submit"],
+input[type="checkbox"],
+input[type="radio"],
+select,
+summary {
+  cursor: pointer;
+}
+
+label input[type="text"],
+label input[type="number"],
+label input[type="email"],
+label textarea {
+  cursor: text;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+input[type="submit"] {
+  background: hsla(0, 0%, 100%, 0.5);
+  border: 1px solid hsla(0, 0%, 0%, 0.2);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: inherit;
+  transition: background-color 0.2s;
+}
+
+input[type="submit"]:hover {
+  background: hsla(0, 0%, 100%, 0.75);
+}
+
+input[type="submit"]:active {
+  background: hsla(0, 0%, 100%, 0.25);
+}
